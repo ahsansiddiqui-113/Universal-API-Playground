@@ -74,7 +74,25 @@ export async function executeWorkflow(id: string, input: Record<string, string>)
   return res.json();
 }
 
-export async function getExecutions(workflowId: string) {
+export async function importFromFigma(figmaUrl: string, accessToken: string): Promise<{
+  name: string;
+  frameCount: number;
+  nodes: unknown[];
+  edges: unknown[];
+}> {
+  const res = await fetch(`${API}/figma/import`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ figmaUrl, accessToken }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { message?: string }).message ?? 'Figma import failed');
+  }
+  return res.json();
+}
+
+export async function getExecutions(workflowId: string): Promise<ExecutionResult[]> {
   const res = await fetch(`${API}/workflows/${workflowId}/executions`);
   if (!res.ok) throw new Error('Failed to fetch executions');
   return res.json();

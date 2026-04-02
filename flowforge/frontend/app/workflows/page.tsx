@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getWorkflows, createWorkflow, deleteWorkflow } from '../../lib/api';
+import FigmaImportModal from '../../components/figma-import/FigmaImportModal';
 
 interface Workflow {
   id: string;
@@ -31,6 +32,7 @@ export default function WorkflowsPage() {
   const [newName, setNewName] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [showFigmaImport, setShowFigmaImport] = useState(false);
 
   async function load() {
     setLoading(true);
@@ -88,12 +90,21 @@ export default function WorkflowsPage() {
             Build and run API pipelines visually.
           </p>
         </div>
-        <button
-          onClick={() => { setShowForm(v => !v); setError(''); }}
-          className="shrink-0 flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors shadow-lg shadow-indigo-500/10"
-        >
-          <span className="text-base leading-none">+</span> New Workflow
-        </button>
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            onClick={() => setShowFigmaImport(true)}
+            className="shrink-0 flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors border border-white/10 hover:border-white/20"
+            title="Import workflow from Figma file"
+          >
+            🎨 Import from Figma
+          </button>
+          <button
+            onClick={() => { setShowForm(v => !v); setError(''); }}
+            className="shrink-0 flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors shadow-lg shadow-indigo-500/10"
+          >
+            <span className="text-base leading-none">+</span> New Workflow
+          </button>
+        </div>
       </div>
 
       {/* Create form */}
@@ -208,6 +219,13 @@ export default function WorkflowsPage() {
             );
           })}
         </ul>
+      )}
+
+      {showFigmaImport && (
+        <FigmaImportModal
+          onClose={() => setShowFigmaImport(false)}
+          onImported={() => { setShowFigmaImport(false); load(); }}
+        />
       )}
     </div>
   );
