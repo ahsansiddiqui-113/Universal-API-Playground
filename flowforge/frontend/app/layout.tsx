@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
+import OnboardingModal from "@/components/onboarding/OnboardingModal";
+import TourButton from "@/components/onboarding/TourButton";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -30,10 +32,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               >
                 Workflows
               </Link>
+              <TourButton />
             </nav>
           </div>
         </header>
         <main className="flex-1 flex flex-col">{children}</main>
+        <OnboardingModal />
       </body>
     </html>
   );
