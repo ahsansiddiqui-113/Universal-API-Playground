@@ -32,7 +32,7 @@ const DEMO_STEPS = [
     n: '3',
     icon: '🤖',
     title: 'AI analyses the design',
-    desc: 'GPT-4o Vision reads every pixel: layout, colors, fonts, spacing, shadows, interactions.',
+    desc: 'Vision reads every pixel: layout, colors, fonts, spacing, shadows, interactions.',
   },
   {
     n: '4',
@@ -405,7 +405,7 @@ export default function FigmaToCodePage() {
                   <>
                     <div className="w-16 h-16 rounded-full border-2 border-indigo-500/20 border-t-indigo-400 animate-spin" />
                     <div>
-                      <p className="text-white font-semibold">AI is reading your design…</p>
+                      <p className="text-white font-semibold">FlowForge is reading your design…</p>
                       <p className="text-gray-500 text-sm mt-1">This usually takes 10–30 seconds.</p>
                     </div>
                   </>
@@ -438,7 +438,7 @@ export default function FigmaToCodePage() {
             },
             {
               q: 'How accurate is the conversion?',
-              a: 'GPT-4o Vision replicates colors, spacing, typography and layout with high fidelity. Complex custom illustrations may need minor tweaks.',
+              a: 'Vision replicates colors, spacing, typography and layout with high fidelity. Complex custom illustrations may need minor tweaks.',
             },
             {
               q: 'Is my image stored?',

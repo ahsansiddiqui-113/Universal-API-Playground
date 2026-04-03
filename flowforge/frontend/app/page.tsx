@@ -91,7 +91,7 @@ export default function Home() {
             </div>
             <p className="text-gray-400 text-sm leading-relaxed">
               Upload any UI screenshot or design mockup and get perfect, production-ready code in{' '}
-              <span className="text-gray-300">HTML/CSS/JS, React, React Native, Flask or Flutter</span> — powered by Gemini 2.0 Flash (free, no credit card).
+              <span className="text-gray-300">HTML/CSS/JS, React, React Native, Flask or Flutter</span>.
             </p>
           </div>
           <span className="text-purple-400 text-lg group-hover:translate-x-1 transition-transform shrink-0">→</span>
