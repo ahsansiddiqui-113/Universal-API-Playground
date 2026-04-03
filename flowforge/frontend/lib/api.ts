@@ -92,6 +92,25 @@ export async function importFromFigma(figmaUrl: string, accessToken: string): Pr
   return res.json();
 }
 
+export async function imageToCode(
+  imageFile: File,
+  framework: string,
+): Promise<{ code: string; framework: string; label: string }> {
+  const formData = new FormData();
+  formData.append('image', imageFile);
+  formData.append('framework', framework);
+
+  const res = await fetch(`${API}/figma/image-to-code`, {
+    method: 'POST',
+    body: formData,
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { message?: string }).message ?? 'Image conversion failed');
+  }
+  return res.json();
+}
+
 export async function getExecutions(workflowId: string): Promise<ExecutionResult[]> {
   const res = await fetch(`${API}/workflows/${workflowId}/executions`);
   if (!res.ok) throw new Error('Failed to fetch executions');

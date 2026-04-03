@@ -73,6 +73,31 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── Figma → Code feature highlight ──────────────────────────────── */}
+      <section className="px-6 pb-12 max-w-screen-lg mx-auto w-full">
+        <Link
+          href="/figma-to-code"
+          className="group flex flex-col sm:flex-row items-start sm:items-center gap-5 rounded-2xl border border-purple-500/20 bg-gradient-to-r from-purple-500/5 to-pink-500/5 p-6 hover:border-purple-500/40 hover:from-purple-500/10 hover:to-pink-500/10 transition-all"
+        >
+          <div className="w-14 h-14 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-3xl shrink-0">
+            🎨
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <p className="font-bold text-white text-base">Figma → Code Converter</p>
+              <span className="text-[10px] font-semibold bg-purple-500/20 border border-purple-500/30 text-purple-300 px-2 py-0.5 rounded-full">
+                NEW · AI-Powered
+              </span>
+            </div>
+            <p className="text-gray-400 text-sm leading-relaxed">
+              Upload any UI screenshot or design mockup and get perfect, production-ready code in{' '}
+              <span className="text-gray-300">HTML/CSS/JS, React, React Native, Flask or Flutter</span> — powered by Gemini 2.0 Flash (free, no credit card).
+            </p>
+          </div>
+          <span className="text-purple-400 text-lg group-hover:translate-x-1 transition-transform shrink-0">→</span>
+        </Link>
+      </section>
+
       {/* Node types */}
       <section className="px-6 pb-20 max-w-screen-lg mx-auto w-full">
         <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-widest text-center mb-8">
@@ -111,3 +136,4 @@ export default function Home() {
     </div>
   );
 }
+
