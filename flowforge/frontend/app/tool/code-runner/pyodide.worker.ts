@@ -45,7 +45,11 @@ async function loadPyodideRuntime(): Promise<void> {
 
   try {
     // Import Pyodide from CDN
-    importScripts('https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js');
+    const script = await fetch('https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js').then(r => r.text());
+    const blob = new Blob([script], { type: 'application/javascript' });
+    const url = URL.createObjectURL(blob);
+    importScripts(url);
+    URL.revokeObjectURL(url);
 
     pyodide = await (self as any).loadPyodide({
       indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/',
@@ -160,3 +164,4 @@ loadPyodideRuntime();
 function importScripts(arg0: string) {
     throw new Error("Function not implemented.");
 }
+

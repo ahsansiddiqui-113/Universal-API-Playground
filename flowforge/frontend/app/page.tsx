@@ -73,6 +73,31 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── Tools Hub feature highlight ──────────────────────────────── */}
+      <section className="px-6 pb-4 max-w-screen-lg mx-auto w-full">
+        <Link
+          href="/tool"
+          className="group flex flex-col sm:flex-row items-start sm:items-center gap-5 rounded-2xl border border-indigo-500/20 bg-gradient-to-r from-indigo-500/5 to-blue-500/5 p-6 hover:border-indigo-500/40 hover:from-indigo-500/10 hover:to-blue-500/10 transition-all"
+        >
+          <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-3xl shrink-0">
+            🛠
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <p className="font-bold text-white text-base">Developer Tools Hub</p>
+              <span className="text-[10px] font-semibold bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 px-2 py-0.5 rounded-full">
+                17 tools
+              </span>
+            </div>
+            <p className="text-gray-400 text-sm leading-relaxed">
+              JSON Formatter, Zod Schema Generator, Tailwind Sorter, SVG → React, Curl Converter, Log Anonymizer,{' '}
+              <span className="text-gray-300">Code Runner, GEO Analyzer, MCP Inspector</span> and more — all free, no signup.
+            </p>
+          </div>
+          <span className="text-indigo-400 text-lg group-hover:translate-x-1 transition-transform shrink-0">→</span>
+        </Link>
+      </section>
+
       {/* ── Figma → Code feature highlight ──────────────────────────────── */}
       <section className="px-6 pb-12 max-w-screen-lg mx-auto w-full">
         <Link
