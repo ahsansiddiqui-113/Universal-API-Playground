@@ -265,7 +265,7 @@ export default function FigmaToCodePage() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(99,102,241,0.18),transparent)] pointer-events-none" />
         <div className="inline-flex items-center gap-2 text-xs font-semibold bg-purple-500/10 border border-purple-500/20 text-purple-300 px-3 py-1.5 rounded-full">
           <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
-          AI-Powered · Gemini 2.0 Flash · Free
+          FlowForge AI Powered Figma Converter
         </div>
         <h1 className="text-5xl sm:text-6xl font-extrabold tracking-tight">
           <span className="bg-gradient-to-br from-white to-gray-400 bg-clip-text text-transparent">Design to Code.</span>
@@ -363,7 +363,7 @@ export default function FigmaToCodePage() {
               {loading ? (
                 <>
                   <span className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
-                  Analysing design with Gemini…
+                  Analysing design with FlowForge
                 </>
               ) : (
                 <>
@@ -446,7 +446,7 @@ export default function FigmaToCodePage() {
             },
             {
               q: 'Do I need to set up anything?',
-              a: 'You need a free Gemini API key. Get one in seconds at aistudio.google.com/apikey (no credit card!) and add it as GEMINI_API_KEY in backend/.env, then restart the backend.',
+              a: 'You need a free Gemini API key. Get one in seconds at aistudio.google.com/apikey (no credit card!) and add it as OPENAI_API_KEY in backend/.env, then restart the backend.',
             },
           ].map(item => (
             <div key={item.q} className="bg-gray-900/60 rounded-xl border border-white/5 p-5">
