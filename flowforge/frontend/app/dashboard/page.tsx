@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { getWorkflows } from '@/lib/api';
 
@@ -13,10 +14,18 @@ type WorkflowSummary = {
 };
 
 export default function DashboardPage() {
-  const { user, loading } = useAuth();
+  const { user, loading, backendOffline } = useAuth();
+  const router = useRouter();
   const [workflows, setWorkflows] = useState<WorkflowSummary[]>([]);
   const [error, setError] = useState('');
   const [loadingWorkflows, setLoadingWorkflows] = useState(true);
+
+  // Redirect unauthenticated users to login (backend offline: stay, not expired)
+  useEffect(() => {
+    if (!loading && !user && !backendOffline) {
+      router.replace('/login?next=/dashboard');
+    }
+  }, [loading, user, backendOffline, router]);
 
   useEffect(() => {
     if (!user) {
@@ -34,12 +43,28 @@ export default function DashboardPage() {
     return <div className="px-6 py-12 text-sm text-gray-400">Loading dashboard…</div>;
   }
 
-  if (!user) {
+  if (backendOffline) {
     return (
-      <div className="px-6 py-12 text-sm text-gray-400">
-        Your session has expired. <Link href="/login" className="text-indigo-400 hover:text-indigo-300">Log in again</Link>.
+      <div className="px-6 py-16 flex flex-col items-center gap-4 text-center">
+        <div className="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center text-2xl">⚡</div>
+        <p className="text-base font-semibold text-white">Backend server is offline</p>
+        <p className="text-sm text-gray-400 max-w-sm">
+          The API server is not running on port 3000.{' '}
+          <span className="font-mono text-indigo-400">npm run start:dev</span> in the{' '}
+          <span className="font-mono text-indigo-400">backend/</span> directory.
+        </p>
+        <button
+          onClick={() => window.location.reload()}
+          className="mt-2 text-xs text-gray-500 underline"
+        >
+          Retry
+        </button>
       </div>
     );
+  }
+
+  if (!user) {
+    return <div className="px-6 py-12 text-sm text-gray-400">Redirecting…</div>;
   }
 
   return (

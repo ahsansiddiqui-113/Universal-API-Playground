@@ -8,7 +8,7 @@ import TourButton from '@/components/onboarding/TourButton';
 
 export default function SiteHeader() {
   const router = useRouter();
-  const { user, loading, logout } = useAuth();
+  const { user, loading, logout, backendOffline } = useAuth();
 
   async function handleLogout() {
     await logout();
@@ -18,6 +18,14 @@ export default function SiteHeader() {
   }
 
   return (
+    <>
+      {backendOffline && (
+        <div className="bg-red-900/80 border-b border-red-800 px-4 py-1.5 text-center text-xs text-red-200">
+          ⚠️ Backend server is offline — run{' '}
+          <span className="font-mono bg-red-950/60 px-1 rounded">npm run start:dev</span>{' '}
+          in <span className="font-mono">backend/</span>
+        </div>
+      )}
     <header className="shrink-0 border-b border-white/5 bg-gray-950/80 backdrop-blur-sm sticky top-0 z-50">
       <div className="max-w-screen-xl mx-auto px-6 h-14 flex items-center justify-between gap-4">
         <Link href="/" className="flex items-center gap-2.5 group">
@@ -83,5 +91,6 @@ export default function SiteHeader() {
         </nav>
       </div>
     </header>
+    </>
   );
 }

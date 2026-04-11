@@ -13,6 +13,14 @@ export class ApiError extends Error {
   }
 }
 
+/** Thrown when the backend is unreachable (ECONNREFUSED / network down). */
+export class NetworkError extends Error {
+  constructor(message = 'Cannot reach the server. Is the backend running?') {
+    super(message);
+    this.name = 'NetworkError';
+  }
+}
+
 export async function apiRequest<T>(
   path: string,
   init: RequestInit = {},
@@ -33,6 +41,9 @@ export async function apiRequest<T>(
     ...init,
     credentials: 'include',
     headers,
+  }).catch((err: unknown) => {
+    // fetch() throws a TypeError when the server is unreachable
+    throw new NetworkError(err instanceof Error ? err.message : 'Network request failed');
   });
 
   if (

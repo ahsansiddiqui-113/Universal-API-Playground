@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Disallow private/auth routes
+Disallow: /dashboard
+Disallow: /api/
+
+# Sitemaps
+Sitemap: https://flowforge.dev/sitemap.xml
