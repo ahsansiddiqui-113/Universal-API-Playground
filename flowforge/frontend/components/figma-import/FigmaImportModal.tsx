@@ -311,7 +311,6 @@ export default function FigmaImportModal({ onClose, onImported }: FigmaImportMod
         '-' + Date.now();
       const wf = await createWorkflow({
         name: workflowName,
-        userId: 'anonymous',
         nodes: parseResult.nodes,
         edges: parseResult.edges,
         slug,

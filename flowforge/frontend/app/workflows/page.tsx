@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getWorkflows, createWorkflow, deleteWorkflow } from '../../lib/api';
+import { trackEvent } from '@/lib/analytics';
 import FigmaImportModal from '../../components/figma-import/FigmaImportModal';
 import { createApiTestStarterWorkflow } from '../../lib/workflow-starter';
 
@@ -59,11 +60,11 @@ export default function WorkflowsPage() {
       const starterWorkflow = createApiTestStarterWorkflow();
       await createWorkflow({
         name: newName.trim(),
-        userId: 'anonymous',
         nodes: starterWorkflow.nodes,
         edges: starterWorkflow.edges,
         slug,
       });
+      trackEvent('workflow_created', { source: 'workflows_page' });
       setNewName('');
       setShowForm(false);
       await load();

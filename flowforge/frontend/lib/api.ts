@@ -1,77 +1,50 @@
 import type { WorkflowData, ExecutionResult } from './types';
-
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+import { apiRequest } from './http';
 
 export async function getWorkflows(): Promise<WorkflowData[]> {
-  const res = await fetch(`${API}/workflows`);
-  if (!res.ok) throw new Error('Failed to fetch workflows');
-  return res.json();
+  return apiRequest<WorkflowData[]>('/workflows');
 }
 
 export async function getWorkflow(id: string): Promise<WorkflowData> {
-  const res = await fetch(`${API}/workflows/${id}`);
-  if (!res.ok) throw new Error('Failed to fetch workflow');
-  return res.json();
+  return apiRequest<WorkflowData>(`/workflows/${id}`);
 }
 
 export async function getWorkflowBySlug(slug: string): Promise<WorkflowData> {
-  const res = await fetch(`${API}/workflows/slug/${encodeURIComponent(slug)}`);
-  if (!res.ok) {
-    if (res.status === 404) throw new Error(`No workflow found for slug "${slug}"`);
-    throw new Error('Failed to fetch workflow');
-  }
-  return res.json();
+  return apiRequest<WorkflowData>(`/workflows/slug/${encodeURIComponent(slug)}`);
 }
 
 export async function createWorkflow(data: {
   name: string;
-  userId?: string;
   nodes: unknown[];
   edges: unknown[];
   isPublic?: boolean;
   slug: string;
 }): Promise<WorkflowData> {
-  const res = await fetch(`${API}/workflows`, {
+  return apiRequest<WorkflowData>('/workflows', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error((err as { message?: string }).message ?? 'Failed to create workflow');
-  }
-  return res.json();
 }
 
 export async function updateWorkflow(
   id: string,
   data: Partial<{ name: string; nodes: unknown[]; edges: unknown[]; isPublic: boolean }>,
 ): Promise<WorkflowData> {
-  const res = await fetch(`${API}/workflows/${id}`, {
+  return apiRequest<WorkflowData>(`/workflows/${id}`, {
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
-  if (!res.ok) throw new Error('Failed to update workflow');
-  return res.json();
 }
 
 export async function deleteWorkflow(id: string): Promise<void> {
-  const res = await fetch(`${API}/workflows/${id}`, { method: 'DELETE' });
-  if (!res.ok) throw new Error('Failed to delete workflow');
+  await apiRequest<void>(`/workflows/${id}`, { method: 'DELETE' });
 }
 
-export async function executeWorkflow(id: string, input: Record<string, string>): Promise<ExecutionResult> {
-  const res = await fetch(`${API}/workflows/${id}/execute`, {
+export async function executeWorkflow(id: string, input: Record<string, unknown>): Promise<ExecutionResult> {
+  return apiRequest<ExecutionResult>(`/workflows/${id}/execute`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input),
   });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error((err as { message?: string }).message ?? 'Execution failed');
-  }
-  return res.json();
 }
 
 export async function importFromFigma(figmaUrl: string, accessToken: string): Promise<{
@@ -80,16 +53,15 @@ export async function importFromFigma(figmaUrl: string, accessToken: string): Pr
   nodes: unknown[];
   edges: unknown[];
 }> {
-  const res = await fetch(`${API}/figma/import`, {
+  return apiRequest<{
+    name: string;
+    frameCount: number;
+    nodes: unknown[];
+    edges: unknown[];
+  }>('/figma/import', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ figmaUrl, accessToken }),
   });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error((err as { message?: string }).message ?? 'Figma import failed');
-  }
-  return res.json();
 }
 
 export async function imageToCode(
@@ -100,19 +72,12 @@ export async function imageToCode(
   formData.append('image', imageFile);
   formData.append('framework', framework);
 
-  const res = await fetch(`${API}/figma/image-to-code`, {
+  return apiRequest<{ code: string; framework: string; label: string }>('/figma/image-to-code', {
     method: 'POST',
     body: formData,
   });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error((err as { message?: string }).message ?? 'Image conversion failed');
-  }
-  return res.json();
 }
 
 export async function getExecutions(workflowId: string): Promise<ExecutionResult[]> {
-  const res = await fetch(`${API}/workflows/${workflowId}/executions`);
-  if (!res.ok) throw new Error('Failed to fetch executions');
-  return res.json();
+  return apiRequest<ExecutionResult[]>(`/workflows/${workflowId}/executions`);
 }
