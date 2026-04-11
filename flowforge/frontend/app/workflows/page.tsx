@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getWorkflows, createWorkflow, deleteWorkflow } from '../../lib/api';
 import FigmaImportModal from '../../components/figma-import/FigmaImportModal';
+import { createApiTestStarterWorkflow } from '../../lib/workflow-starter';
 
 interface Workflow {
   id: string;
@@ -11,8 +12,8 @@ interface Workflow {
   slug: string;
   isPublic: boolean;
   createdAt: string;
-  nodes?: any[];
-  edges?: any[];
+  nodes?: unknown[];
+  edges?: unknown[];
 }
 
 function NodeCountBadge({ count, label, color }: { count: number; label: string; color: string }) {
@@ -39,8 +40,8 @@ export default function WorkflowsPage() {
     try {
       const data = await getWorkflows();
       setWorkflows(data);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Failed to load workflows');
     } finally {
       setLoading(false);
     }
@@ -55,12 +56,19 @@ export default function WorkflowsPage() {
     setError('');
     try {
       const slug = newName.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') + '-' + Date.now();
-      await createWorkflow({ name: newName.trim(), userId: 'anonymous', nodes: [], edges: [], slug });
+      const starterWorkflow = createApiTestStarterWorkflow();
+      await createWorkflow({
+        name: newName.trim(),
+        userId: 'anonymous',
+        nodes: starterWorkflow.nodes,
+        edges: starterWorkflow.edges,
+        slug,
+      });
       setNewName('');
       setShowForm(false);
       await load();
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Failed to create workflow');
     } finally {
       setCreating(false);
     }
@@ -72,8 +80,8 @@ export default function WorkflowsPage() {
     try {
       await deleteWorkflow(id);
       setWorkflows(wfs => wfs.filter(w => w.id !== id));
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Failed to delete workflow');
     } finally {
       setDeleting(null);
     }
@@ -111,6 +119,9 @@ export default function WorkflowsPage() {
       {showForm && (
         <div className="mb-6 bg-gray-900 border border-white/10 rounded-xl p-5">
           <h2 className="text-sm font-semibold text-white mb-3">New Workflow</h2>
+          <p className="text-xs text-gray-500 mb-4">
+            New workflows start with an example <span className="text-gray-300">Input -&gt; API -&gt; Transform -&gt; Output</span> flow so you can test an API right away.
+          </p>
           <form onSubmit={handleCreate} className="flex gap-3">
             <input
               autoFocus

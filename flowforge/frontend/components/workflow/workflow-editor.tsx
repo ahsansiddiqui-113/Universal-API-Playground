@@ -1,7 +1,9 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { updateWorkflow, executeWorkflow } from '../../lib/api';
+import type { ExecutionResult } from '../../lib/types';
+import { getExampleRunInput } from '../../lib/workflow-starter';
 
 type NodeType = 'input' | 'api' | 'transform' | 'output';
 
@@ -17,10 +19,10 @@ interface WorkflowNode {
   method?: string;
   headers?: Record<string, string>;
   bodyMode?: string;
-  body?: any;
+  body?: unknown;
   // transform
   transformMethod?: string;
-  params?: Record<string, any>;
+  params?: Record<string, unknown>;
   // output
   format?: string;
 }
@@ -61,13 +63,21 @@ export default function WorkflowEditor({ workflow }: WorkflowEditorProps) {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [running, setRunning] = useState(false);
-  const [runInput, setRunInput] = useState('{}');
-  const [runResult, setRunResult] = useState<any>(null);
+  const [runInput, setRunInput] = useState(() => getExampleRunInput(workflow.nodes || []));
+  const [runResult, setRunResult] = useState<ExecutionResult | null>(null);
   const [runError, setRunError] = useState('');
   const [showRunPanel, setShowRunPanel] = useState(false);
   const [connectingFrom, setConnectingFrom] = useState<string | null>(null);
 
   const selectedNode = nodes.find(n => n.id === selectedNodeId) ?? null;
+  const exampleRunInput = getExampleRunInput(nodes);
+
+  useEffect(() => {
+    const currentInput = runInput.trim();
+    if ((currentInput === '' || currentInput === '{}' || currentInput === '{\n}') && runInput !== exampleRunInput) {
+      setRunInput(exampleRunInput);
+    }
+  }, [exampleRunInput, runInput]);
 
   const addNode = useCallback((type: NodeType) => {
     const id = `${type}-${Date.now()}`;
@@ -111,7 +121,7 @@ export default function WorkflowEditor({ workflow }: WorkflowEditorProps) {
   async function handleSave() {
     setSaving(true);
     try {
-      await updateWorkflow(workflow.id, { nodes: nodes as any[], edges: edges as any[] });
+      await updateWorkflow(workflow.id, { nodes, edges });
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } catch { /* ignore */ }
@@ -126,8 +136,8 @@ export default function WorkflowEditor({ workflow }: WorkflowEditorProps) {
       const input = JSON.parse(runInput);
       const result = await executeWorkflow(workflow.id, input);
       setRunResult(result);
-    } catch (e: any) {
-      setRunError(e.message);
+    } catch (e: unknown) {
+      setRunError(e instanceof Error ? e.message : 'Execution failed');
     } finally {
       setRunning(false);
     }
@@ -314,6 +324,7 @@ export default function WorkflowEditor({ workflow }: WorkflowEditorProps) {
         {showRunPanel ? (
           <RunPanel
             nodes={nodes}
+            exampleRunInput={exampleRunInput}
             running={running}
             runInput={runInput}
             setRunInput={setRunInput}
@@ -351,6 +362,7 @@ function NodePropertiesPanel({ node, allNodes, onChange, onDelete }: {
 }) {
   const meta = NODE_META[node.type];
   const otherNodes = allNodes.filter(n => n.id !== node.id);
+  const inputExampleFields = node.type === 'input' && node.fields && node.fields.length > 0 ? node.fields : ['userId'];
 
   return (
     <div className="flex flex-col h-full">
@@ -394,6 +406,10 @@ function NodePropertiesPanel({ node, allNodes, onChange, onDelete }: {
                 ))}
               </div>
             )}
+            <ExampleBox
+              title="Example input"
+              code={`Fields: ${inputExampleFields.join(', ')}\nRun with:\n${getExampleRunInput([{ type: 'input', fields: inputExampleFields }])}`}
+            />
           </Section>
         )}
 
@@ -418,8 +434,12 @@ function NodePropertiesPanel({ node, allNodes, onChange, onDelete }: {
               </div>
               <p className="text-xs text-gray-600 mt-1.5">
                 Use <code className="text-indigo-400">{'{{field}}'}</code> for input values or{' '}
-                <code className="text-purple-400">{'{{nodeId.field}}'}</code> for a previous node's output.
+                <code className="text-purple-400">{'{{nodeId.field}}'}</code> for a previous node&apos;s output.
               </p>
+              <ExampleBox
+                title="Example API node"
+                code={`Method: GET\nURL: https://jsonplaceholder.typicode.com/users/{{userId}}`}
+              />
             </Section>
 
             <Section title="Request Body" hint="How to populate the request body.">
@@ -475,13 +495,17 @@ function NodePropertiesPanel({ node, allNodes, onChange, onDelete }: {
                 placeholder='{ "field": "data.result" }'
               />
               <div className="mt-2 text-xs text-gray-600 bg-gray-800/50 rounded-lg p-3 space-y-0.5 font-mono">
-                <p><span className="text-purple-400">extractField</span> → field: "a.b"</p>
-                <p><span className="text-purple-400">pick / omit</span>  → fields: ["a","b"]</p>
+                <p><span className="text-purple-400">extractField</span> → field: &quot;a.b&quot;</p>
+                <p><span className="text-purple-400">pick / omit</span>  → fields: [&quot;a&quot;,&quot;b&quot;]</p>
                 <p><span className="text-purple-400">mapField</span>     → from, to</p>
                 <p><span className="text-purple-400">filterArray</span>  → field, value</p>
                 <p><span className="text-purple-400">merge</span>        → extra: {'{}'}</p>
-                <p><span className="text-purple-400">wrap</span>         → key: "data"</p>
+                <p><span className="text-purple-400">wrap</span>         → key: &quot;data&quot;</p>
               </div>
+              <ExampleBox
+                title="Example transform node"
+                code={`Method: pick\nParams:\n{\n  "fields": ["id", "name", "email", "website"]\n}`}
+              />
             </Section>
           </>
         )}
@@ -497,6 +521,10 @@ function NodePropertiesPanel({ node, allNodes, onChange, onDelete }: {
               <option value="json">JSON (object)</option>
               <option value="text">Text (stringify)</option>
             </select>
+            <ExampleBox
+              title="Example output"
+              code={`json -> {\n  "id": 1,\n  "name": "Leanne Graham",\n  "email": "Sincere@april.biz"\n}\n\ntext -> "{\\"id\\":1,\\"name\\":\\"Leanne Graham\\"}"`}
+            />
           </Section>
         )}
 
@@ -541,12 +569,13 @@ function NodePropertiesPanel({ node, allNodes, onChange, onDelete }: {
 
 // ── Run Panel ────────────────────────────────────────────────────────────────
 
-function RunPanel({ nodes, running, runInput, setRunInput, runResult, runError, onRun, onClose }: {
+function RunPanel({ nodes, exampleRunInput, running, runInput, setRunInput, runResult, runError, onRun, onClose }: {
   nodes: WorkflowNode[];
+  exampleRunInput: string;
   running: boolean;
   runInput: string;
   setRunInput: (v: string) => void;
-  runResult: any;
+  runResult: ExecutionResult | null;
   runError: string;
   onRun: () => void;
   onClose: () => void;
@@ -565,13 +594,28 @@ function RunPanel({ nodes, running, runInput, setRunInput, runResult, runError, 
 
       <div className="p-5 flex-1 overflow-y-auto space-y-4">
         <Section title="Input JSON" hint="JSON object matching your Input node's declared fields.">
-          <textarea
-            value={runInput}
-            onChange={e => setRunInput(e.target.value)}
-            className={`${inputCls} font-mono text-xs`}
-            rows={5}
-            placeholder="{}"
-          />
+          <div className="space-y-2">
+            <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-xs font-semibold text-emerald-300">Example for this workflow</p>
+                <button
+                  type="button"
+                  onClick={() => setRunInput(exampleRunInput)}
+                  className="text-xs text-emerald-300 hover:text-emerald-200 transition-colors"
+                >
+                  Use Example
+                </button>
+              </div>
+              <pre className="mt-2 whitespace-pre-wrap break-words text-xs font-mono text-emerald-200">{exampleRunInput}</pre>
+            </div>
+            <textarea
+              value={runInput}
+              onChange={e => setRunInput(e.target.value)}
+              className={`${inputCls} font-mono text-xs`}
+              rows={5}
+              placeholder={exampleRunInput}
+            />
+          </div>
         </Section>
 
         <button
@@ -624,7 +668,7 @@ function RunPanel({ nodes, running, runInput, setRunInput, runResult, runError, 
                   {nodes.map(node => {
                     const output = runResult.nodeOutputs?.[node.id];
                     if (output === undefined) return null;
-                    const hasError = output?.__error;
+                    const hasError = hasNodeExecutionError(output);
                     const isExpanded = expandedNode === node.id;
                     const meta = NODE_META[node.type];
                     return (
@@ -683,4 +727,17 @@ function Section({ title, hint, children }: { title: string; hint?: string; chil
       {children}
     </div>
   );
+}
+
+function ExampleBox({ title, code }: { title: string; code: string }) {
+  return (
+    <div className="mt-3 rounded-lg border border-white/10 bg-gray-800/50 p-3">
+      <p className="text-[11px] font-semibold uppercase tracking-widest text-gray-500">{title}</p>
+      <pre className="mt-2 whitespace-pre-wrap break-words text-xs font-mono text-gray-300">{code}</pre>
+    </div>
+  );
+}
+
+function hasNodeExecutionError(output: unknown): boolean {
+  return typeof output === 'object' && output !== null && '__error' in output;
 }
