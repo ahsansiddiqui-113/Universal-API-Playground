@@ -3,30 +3,41 @@ import { MetadataRoute } from 'next';
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://flowforge.dev';
 
 const TOOL_PAGES = [
+  // Top priority tools (high search volume)
   { slug: 'json-formatter',     priority: 1.0, changeFreq: 'weekly' as const },
   { slug: 'curl-converter',     priority: 1.0, changeFreq: 'weekly' as const },
+  { slug: 'jwt-debugger',       priority: 1.0, changeFreq: 'weekly' as const },
   { slug: 'base64-encoder',     priority: 0.9, changeFreq: 'weekly' as const },
-  { slug: 'jwt-decoder',        priority: 0.9, changeFreq: 'weekly' as const },
+  { slug: 'hash-generator',     priority: 0.9, changeFreq: 'weekly' as const },
   { slug: 'uuid-generator',     priority: 0.9, changeFreq: 'weekly' as const },
   { slug: 'regex-tester',       priority: 0.9, changeFreq: 'weekly' as const },
-  { slug: 'sql-formatter',      priority: 0.9, changeFreq: 'weekly' as const },
   { slug: 'markdown-preview',   priority: 0.9, changeFreq: 'weekly' as const },
-  { slug: 'html-beautifier',    priority: 0.9, changeFreq: 'weekly' as const },
   { slug: 'color-converter',    priority: 0.9, changeFreq: 'weekly' as const },
   { slug: 'timestamp-converter',priority: 0.9, changeFreq: 'weekly' as const },
+  { slug: 'sql-formatter',      priority: 0.9, changeFreq: 'weekly' as const },
+
+  // Medium priority tools
   { slug: 'json-to-zod',        priority: 0.8, changeFreq: 'monthly' as const },
   { slug: 'tailwind-sorter',    priority: 0.8, changeFreq: 'monthly' as const },
   { slug: 'tailwind-debloater', priority: 0.8, changeFreq: 'monthly' as const },
   { slug: 'env-validator',      priority: 0.8, changeFreq: 'monthly' as const },
   { slug: 'css-glassmorphism',  priority: 0.8, changeFreq: 'monthly' as const },
   { slug: 'svg-to-react',       priority: 0.8, changeFreq: 'monthly' as const },
+  { slug: 'code-runner',        priority: 0.8, changeFreq: 'monthly' as const },
+
   { slug: 'image-placeholder',  priority: 0.7, changeFreq: 'monthly' as const },
   { slug: 'cron-explainer',     priority: 0.7, changeFreq: 'monthly' as const },
   { slug: 'log-anonymizer',     priority: 0.7, changeFreq: 'monthly' as const },
-  { slug: 'code-runner',        priority: 0.8, changeFreq: 'monthly' as const },
   { slug: 'geo-analyzer',       priority: 0.7, changeFreq: 'monthly' as const },
   { slug: 'mcp-inspector',      priority: 0.7, changeFreq: 'monthly' as const },
   { slug: 'video-downloader',   priority: 0.7, changeFreq: 'monthly' as const },
+
+  // New tools (Phase 2)
+  { slug: 'xml-validator',      priority: 0.8, changeFreq: 'monthly' as const },
+  { slug: 'qr-code-generator',  priority: 0.8, changeFreq: 'monthly' as const },
+  { slug: 'password-generator', priority: 0.8, changeFreq: 'monthly' as const },
+  { slug: 'yaml-json-converter',priority: 0.8, changeFreq: 'monthly' as const },
+  { slug: 'csv-json-converter', priority: 0.8, changeFreq: 'monthly' as const },
 ];
 
 // Programmatic SEO variant pages

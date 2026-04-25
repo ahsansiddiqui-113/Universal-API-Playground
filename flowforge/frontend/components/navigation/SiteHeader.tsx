@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { trackEvent } from '@/lib/analytics';
 import TourButton from '@/components/onboarding/TourButton';
+import { ThemeToggle } from './ThemeToggle';
 
 export default function SiteHeader() {
   const router = useRouter();
@@ -55,6 +56,7 @@ export default function SiteHeader() {
             <span>🎨</span> Figma → Code
           </Link>
           <TourButton />
+          <ThemeToggle />
           {loading ? (
             <span className="text-xs text-gray-500 px-3">Loading…</span>
           ) : user ? (
